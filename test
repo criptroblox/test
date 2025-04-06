@@ -1,0 +1,37 @@
+-- Roblox загрузочный экран, который останавливается на 97%
+
+local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+-- Создаём экран GUI
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "LoadingScreen"
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0.5, 0, 0.1, 0)
+frame.Position = UDim2.new(0.25, 0, 0.45, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+
+local textLabel = Instance.new("TextLabel", frame)
+textLabel.Size = UDim2.new(1, 0, 1, 0)
+textLabel.BackgroundTransparency = 1
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.Font = Enum.Font.SourceSansBold
+textLabel.TextSize = 28
+textLabel.Text = "Загрузка: 0%"
+
+-- Процент загрузки до 97%
+local percent = 0
+while percent < 97 do
+    percent += 1
+    textLabel.Text = "Загрузка: " .. percent .. "%"
+    wait(0.05)
+end
+
+-- Зависание на 97%
+textLabel.Text = "Загрузка: 97%\nЗавершаем, подождите..."
+
+-- Здесь можно оставить зависание или продолжить после задержки
+-- wait(5)
+-- textLabel.Text = "Загрузка завершена!"
+-- screenGui:Destroy()
