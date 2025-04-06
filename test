@@ -1,37 +1,70 @@
--- Roblox загрузочный экран, который останавливается на 97%
+-- Загрузка с красивой панелью, текстом и крутящимся кружочком
 
 local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+local runService = game:GetService("RunService")
 
--- Создаём экран GUI
+-- ScreenGui
 local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.Name = "LoadingScreen"
+screenGui.Name = "FancyLoadingScreen"
+screenGui.ResetOnSpawn = false
 
-local frame = Instance.new("Frame", screenGui)
-frame.Size = UDim2.new(0.5, 0, 0.1, 0)
-frame.Position = UDim2.new(0.25, 0, 0.45, 0)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BorderSizePixel = 0
+-- Основная рамка
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0.4, 0, 0.3, 0)
+mainFrame.Position = UDim2.new(0.3, 0, 0.35, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+mainFrame.BorderSizePixel = 2
+mainFrame.BorderColor3 = Color3.fromRGB(80, 80, 80) -- светло-чёрная рамка
+mainFrame.BackgroundTransparency = 0.1
 
-local textLabel = Instance.new("TextLabel", frame)
-textLabel.Size = UDim2.new(1, 0, 1, 0)
+-- Текст загрузки
+local textLabel = Instance.new("TextLabel", mainFrame)
+textLabel.Size = UDim2.new(1, 0, 0.3, 0)
+textLabel.Position = UDim2.new(0, 0, 0, 0)
 textLabel.BackgroundTransparency = 1
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.Font = Enum.Font.SourceSansBold
 textLabel.TextSize = 28
 textLabel.Text = "Загрузка: 0%"
+textLabel.TextScaled = true
 
--- Процент загрузки до 97%
+-- Вращающийся кружочек
+local circle = Instance.new("ImageLabel", mainFrame)
+circle.Size = UDim2.new(0.25, 0, 0.25, 0)
+circle.Position = UDim2.new(0.375, 0, 0.55, 0)
+circle.BackgroundTransparency = 1
+circle.Image = "rbxassetid://6034980996" -- иконка загрузки (кружок)
+circle.ImageColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Анимация вращения кружка
+local rotation = 0
+local spinning = true
+runService.RenderStepped:Connect(function(dt)
+    if spinning then
+        rotation = (rotation + 180 * dt) % 360
+        circle.Rotation = rotation
+    end
+end)
+
+-- Быстрая загрузка до 91%
 local percent = 0
-while percent < 97 do
+while percent < 91 do
     percent += 1
     textLabel.Text = "Загрузка: " .. percent .. "%"
     wait(0.05)
 end
 
--- Зависание на 97%
-textLabel.Text = "Загрузка: 97%\nЗавершаем, подождите..."
+-- Медленная догрузка с увеличением задержки
+local delayTime = 5
+while percent < 100 do
+    wait(delayTime)
+    percent += 1
+    textLabel.Text = "Загрузка: " .. percent .. "%"
+    delayTime += 20
+end
 
--- Здесь можно оставить зависание или продолжить после задержки
--- wait(5)
--- textLabel.Text = "Загрузка завершена!"
--- screenGui:Destroy()
+-- Завершение
+spinning = false
+textLabel.Text = "Загрузка завершена!"
+wait(2)
+screenGui:Destroy()
