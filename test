@@ -1,70 +1,96 @@
--- Загрузка с красивой панелью, текстом и крутящимся кружочком
+-- Круговая загрузка с текстом и подписью от scriptixrbx
 
 local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 local runService = game:GetService("RunService")
 
--- ScreenGui
+-- GUI
 local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.Name = "FancyLoadingScreen"
+screenGui.Name = "ScriptixCircleLoading"
 screenGui.ResetOnSpawn = false
 
--- Основная рамка
+-- Основной фрейм
 local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0.4, 0, 0.3, 0)
-mainFrame.Position = UDim2.new(0.3, 0, 0.35, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-mainFrame.BorderSizePixel = 2
-mainFrame.BorderColor3 = Color3.fromRGB(80, 80, 80) -- светло-чёрная рамка
-mainFrame.BackgroundTransparency = 0.1
+mainFrame.Size = UDim2.new(0.45, 0, 0.45, 0)
+mainFrame.Position = UDim2.new(0.275, 0, 0.275, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
 
--- Текст загрузки
-local textLabel = Instance.new("TextLabel", mainFrame)
-textLabel.Size = UDim2.new(1, 0, 0.3, 0)
-textLabel.Position = UDim2.new(0, 0, 0, 0)
-textLabel.BackgroundTransparency = 1
-textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-textLabel.Font = Enum.Font.SourceSansBold
-textLabel.TextSize = 28
-textLabel.Text = "Загрузка: 0%"
-textLabel.TextScaled = true
+-- UI круг загрузки
+local loadingCircle = Instance.new("ImageLabel", mainFrame)
+loadingCircle.Size = UDim2.new(0.4, 0, 0.4, 0)
+loadingCircle.Position = UDim2.new(0.3, 0, 0.1, 0)
+loadingCircle.BackgroundTransparency = 1
+loadingCircle.Image = "rbxassetid://11423246398" -- круговой лоадер
+loadingCircle.ImageColor3 = Color3.fromRGB(255, 255, 255)
+loadingCircle.ImageTransparency = 0.2
 
--- Вращающийся кружочек
-local circle = Instance.new("ImageLabel", mainFrame)
-circle.Size = UDim2.new(0.25, 0, 0.25, 0)
-circle.Position = UDim2.new(0.375, 0, 0.55, 0)
-circle.BackgroundTransparency = 1
-circle.Image = "rbxassetid://6034980996" -- иконка загрузки (кружок)
-circle.ImageColor3 = Color3.fromRGB(255, 255, 255)
+-- Маска для заполнения круга
+local fill = Instance.new("ImageLabel", loadingCircle)
+fill.Size = UDim2.new(1, 0, 1, 0)
+fill.Position = UDim2.new(0, 0, 0, 0)
+fill.BackgroundTransparency = 1
+fill.Image = "rbxassetid://11423246398"
+fill.ImageColor3 = Color3.fromRGB(85, 170, 255)
+fill.ImageTransparency = 0
+fill.Rotation = -90
+fill.ClipsDescendants = true
 
--- Анимация вращения кружка
-local rotation = 0
-local spinning = true
-runService.RenderStepped:Connect(function(dt)
-    if spinning then
-        rotation = (rotation + 180 * dt) % 360
-        circle.Rotation = rotation
-    end
-end)
+-- Текст процентов
+local percentLabel = Instance.new("TextLabel", mainFrame)
+percentLabel.Size = UDim2.new(1, 0, 0.15, 0)
+percentLabel.Position = UDim2.new(0, 0, 0.55, 0)
+percentLabel.BackgroundTransparency = 1
+percentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+percentLabel.Font = Enum.Font.GothamBold
+percentLabel.TextSize = 30
+percentLabel.Text = "Загрузка: 0%"
+percentLabel.TextScaled = true
 
--- Быстрая загрузка до 91%
+-- Инфо-текст
+local infoLabel = Instance.new("TextLabel", mainFrame)
+infoLabel.Size = UDim2.new(1, -20, 0.2, 0)
+infoLabel.Position = UDim2.new(0, 10, 0.7, 0)
+infoLabel.BackgroundTransparency = 1
+infoLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+infoLabel.Font = Enum.Font.Gotham
+infoLabel.TextSize = 18
+infoLabel.TextWrapped = true
+infoLabel.Text = "Пожалуйста, подождите. Мы загружаем скрипт, чтобы вам было комфортно им пользоваться."
+
+-- Подпись
+local creditLabel = Instance.new("TextLabel", mainFrame)
+creditLabel.Size = UDim2.new(1, 0, 0.1, 0)
+creditLabel.Position = UDim2.new(0, 0, 0.9, 0)
+creditLabel.BackgroundTransparency = 1
+creditLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+creditLabel.Font = Enum.Font.Gotham
+creditLabel.TextSize = 16
+creditLabel.Text = "by: scriptixrbx"
+creditLabel.TextScaled = true
+
+-- Функция обновления круга по проценту
+local function updateCircle(percent)
+    fill.ImageRectSize = Vector2.new(360 * (percent / 100), 360)
+end
+
+-- Загрузка: до 30% быстро, потом по 6 сек
 local percent = 0
-while percent < 91 do
+
+while percent < 30 do
     percent += 1
-    textLabel.Text = "Загрузка: " .. percent .. "%"
+    percentLabel.Text = "Загрузка: " .. percent .. "%"
+    updateCircle(percent)
     wait(0.05)
 end
 
--- Медленная догрузка с увеличением задержки
-local delayTime = 5
 while percent < 100 do
-    wait(delayTime)
+    wait(6)
     percent += 1
-    textLabel.Text = "Загрузка: " .. percent .. "%"
-    delayTime += 20
+    percentLabel.Text = "Загрузка: " .. percent .. "%"
+    updateCircle(percent)
 end
 
--- Завершение
-spinning = false
-textLabel.Text = "Загрузка завершена!"
+-- Конец загрузки
+percentLabel.Text = "Загрузка завершена!"
 wait(2)
 screenGui:Destroy()
