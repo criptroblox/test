@@ -81,7 +81,7 @@ while percent < 30 do
 end
 
 while percent < 98 do
- wait(4)
+ wait(2.5)
  percent += 1
  percentLabel.Text = "Загрузка: " .. percent .. "%"
  updateCircle(percent)
